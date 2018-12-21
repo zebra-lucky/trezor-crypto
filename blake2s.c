@@ -19,6 +19,9 @@
 #include "blake2_common.h"
 #include "memzero.h"
 
+#if defined(_MSC_VER)
+#pragma(pack(push, 1))
+#endif
 typedef struct blake2s_param__
 {
     uint8_t  digest_length; /* 1 */
@@ -33,7 +36,12 @@ typedef struct blake2s_param__
     /* uint8_t  reserved[0]; */
     uint8_t  salt[BLAKE2S_SALTBYTES]; /* 24 */
     uint8_t  personal[BLAKE2S_PERSONALBYTES];  /* 32 */
+#if defined(_MSC_VER)
+} blake2s_param;
+#pragma pack(pop)
+#else
 } __attribute__((packed)) blake2s_param;
+#endif
 
 static const uint32_t blake2s_IV[8] =
 {
