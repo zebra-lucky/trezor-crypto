@@ -29,6 +29,10 @@
 #include "bignum.h"
 #include "memzero.h"
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 /* big number library */
 
 /* The structure bignum256 is an array of nine 32-bit values, which
@@ -189,7 +193,11 @@ int bn_bitcount(const bignum256 *a)
 	for (i = 8; i >= 0; i--) {
 		int tmp = a->val[i];
 		if (tmp != 0) {
+#if defined(_MSC_VER)
+			return i * 30 + (32 - __lzcnt(tmp));
+#else
 			return i * 30 + (32 - __builtin_clz(tmp));
+#endif
 		}
 	}
 	return 0;
