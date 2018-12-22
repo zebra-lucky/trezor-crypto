@@ -12,3 +12,8 @@ tests/test_check
 tests/libtrezor-crypto.so
 *.os
 *.pyc
+env/
+dist/
+build/
+TrezorCrypto.egg-info/
+trezorcrypto*.so
