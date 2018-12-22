@@ -1,38 +1,50 @@
-sudo: false
-dist: trusty
-language: c
-
-compiler:
-  - clang
-  - gcc
-
-addons:
-  apt:
-    packages:
-    - check
-    - libssl-dev
-    - python3-pip
-    - valgrind
-
-env:
-  global:
-    - PYTHON=python3
-
+sudo: required
+matrix:
+  include:
+  - if: tag =~ .+
+    os: windows
+    language: sh
+    python: 3.6
+    env: x86_64=true
+  - if: tag =~ .+
+    os: windows
+    language: sh
+    python: 3.6
+    env: x86_32=true
+  - if: tag =~ .+
+    os: linux
+    dist: xenial
+    language: python
+    python: '3.6'
+before_install:
+- if [[ -n $TRAVIS_TAG ]] && [[ $TRAVIS_OS_NAME == 'windows' ]] && [[ $x86_64 == 'true' ]]; then
+    choco install -y python3 --version 3.6.7;
+    export PATH="/c/Python36:/c/Python36/Scripts:$PATH";
+    python -m pip install --upgrade pip wheel;
+  fi
+- if [[ -n $TRAVIS_TAG ]] && [[ $TRAVIS_OS_NAME == 'windows' ]] && [[ $x86_32 == 'true' ]]; then
+    choco install -y python3 --version 3.6.7 --x86;
+    export PATH="/c/Python36:/c/Python36/Scripts:$PATH";
+    python -m pip install --upgrade pip wheel;
+  fi
 install:
-  - $PYTHON -m pip install --user pytest ecdsa curve25519-donna pyasn1
-
+- if [[ -n $TRAVIS_TAG ]]; then
+    pip install Cython==0.29.2;
+  fi
 script:
-  - make
-  - ./tests/aestst
-  - ./tests/test_check
-  - CK_TIMEOUT_MULTIPLIER=20 valgrind -q --error-exitcode=1 ./tests/test_check
-  - ./tests/test_openssl 1000
-  - ITERS=10 $PYTHON -m pytest tests/
-
-notifications:
-  webhooks:
-    urls:
-      - http://ci-bot.satoshilabs.com:5000/travis
-    on_success: always
-    on_failure: always
-    on_start: always
+- if [[ -n $TRAVIS_TAG ]]; then
+    python setup.py bdist_wheel;
+  fi
+deploy:
+- provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: qPUQFAwYb8wX3dUOMoV5JBYz+tNxZafyRKHUKmezrNz8q0hfEMTiN20lZEj1LenLUyvZJmWBXk97/VNgCLeJ7Gh+npxbg7k0QqhUpCB5Ly/0TgWxiwjz5ylQum6RQeELq4+QunhocK/0SP3LwrGL84E0SgrFTSAxkzvcqAnV6NWc0Q7pbZAYnaQn7nCeGPdG9wJ8ZGDnCfYioeaOVD1aiGoYolRJdWG1Q+hynjlxSN7qjM4whaHmg9X+UbeaeSOoXQoTt/NB/EgynT5AMOlyTQgE/mV0pnEFl9JqbrvSiXT9VTWbruXVHGuC2ZeHk5vkGA1ICCJpDovmqNB5D+7pzL23Wd/J34ptETcAsLY+a6GdGftdi8xsbFge0mGiokepBfSCPPdv/W9v2rtX7v+Ivva1dbBy0LC3gvBlX5b6dogQSLUKxiGJqEIq9avF3FZYssKbwUzGlhbpzRxX+oVlXNG+u+gbPk05lfW0f/tP/cTeQtCO1pkcWryCLRx6d1EeVGPpnyS35f8qsF0ztAC7H8bQNFv5RbWyoZteDt7tDs7RaAAXtAgPzJr/nJhfxK/sgnyf/VPrJMYRD+8kiSlrCmzKgS58dNWub6Kp3xsQqBKwsMogjMrMtLkVewdyN9tqm+yk+jGmz9pn4iBXMjihjShufc+YMyMm4nsNOrc0hZw=
+  file:
+  - dist/TrezorCrypto-0.0.1-cp36-cp36m-win_amd64.whl
+  - dist/TrezorCrypto-0.0.1-cp36-cp36m-win32.whl
+  - dist/TrezorCrypto-0.0.1-cp36-cp36m-linux_x86_64.whl
+  on:
+    repo: zebra-lucky/trezor-crypto
+    tags: true
+    condition: "$TRAVIS_TAG =~ .+"

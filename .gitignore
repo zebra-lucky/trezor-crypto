@@ -5,6 +5,7 @@ _attic/
 *.d
 *.exe
 *~
+*.swp
 tests/aestst
 tests/test_openssl
 tests/test_speed
