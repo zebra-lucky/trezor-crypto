@@ -2,6 +2,10 @@ sudo: required
 matrix:
   include:
   - if: tag =~ .+
+    os: osx
+    language: ruby
+    osx_image: xcode7.3
+  - if: tag =~ .+
     os: windows
     language: sh
     python: 3.6
@@ -27,13 +31,24 @@ before_install:
     export PATH="/c/Python36:/c/Python36/Scripts:$PATH";
     python -m pip install --upgrade pip wheel;
   fi
+- if [[ -n $TRAVIS_TAG ]] && [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+    curl -O https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg;
+    sudo installer -pkg python-3.6.8-macosx10.9.pkg -target /;
+    curl -O https://bootstrap.pypa.io/get-pip.py;
+    sudo python3 get-pip.py;
+  fi
 install:
-- if [[ -n $TRAVIS_TAG ]]; then
-    pip install Cython==0.29.2;
+- if [[ -n $TRAVIS_TAG ]] && [[ $TRAVIS_OS_NAME != 'osx' ]]; then
+    pip install Cython==0.29.4;
+  else
+    sudo pip3 install Cython==0.29.4;
   fi
 script:
-- if [[ -n $TRAVIS_TAG ]]; then
+- if [[ -n $TRAVIS_TAG ]] && [[ $TRAVIS_OS_NAME != 'osx' ]]; then
     python setup.py bdist_wheel;
+  else
+    python3 setup.py sdist;
+    python3 setup.py bdist_wheel;
   fi
 deploy:
 - provider: releases
@@ -41,9 +56,11 @@ deploy:
   api_key:
     secure: qPUQFAwYb8wX3dUOMoV5JBYz+tNxZafyRKHUKmezrNz8q0hfEMTiN20lZEj1LenLUyvZJmWBXk97/VNgCLeJ7Gh+npxbg7k0QqhUpCB5Ly/0TgWxiwjz5ylQum6RQeELq4+QunhocK/0SP3LwrGL84E0SgrFTSAxkzvcqAnV6NWc0Q7pbZAYnaQn7nCeGPdG9wJ8ZGDnCfYioeaOVD1aiGoYolRJdWG1Q+hynjlxSN7qjM4whaHmg9X+UbeaeSOoXQoTt/NB/EgynT5AMOlyTQgE/mV0pnEFl9JqbrvSiXT9VTWbruXVHGuC2ZeHk5vkGA1ICCJpDovmqNB5D+7pzL23Wd/J34ptETcAsLY+a6GdGftdi8xsbFge0mGiokepBfSCPPdv/W9v2rtX7v+Ivva1dbBy0LC3gvBlX5b6dogQSLUKxiGJqEIq9avF3FZYssKbwUzGlhbpzRxX+oVlXNG+u+gbPk05lfW0f/tP/cTeQtCO1pkcWryCLRx6d1EeVGPpnyS35f8qsF0ztAC7H8bQNFv5RbWyoZteDt7tDs7RaAAXtAgPzJr/nJhfxK/sgnyf/VPrJMYRD+8kiSlrCmzKgS58dNWub6Kp3xsQqBKwsMogjMrMtLkVewdyN9tqm+yk+jGmz9pn4iBXMjihjShufc+YMyMm4nsNOrc0hZw=
   file:
-  - dist/TrezorCrypto-0.0.1-cp36-cp36m-win_amd64.whl
-  - dist/TrezorCrypto-0.0.1-cp36-cp36m-win32.whl
-  - dist/TrezorCrypto-0.0.1-cp36-cp36m-linux_x86_64.whl
+  - dist/TrezorCrypto-0.0.2.tar.gz
+  - dist/TrezorCrypto-0.0.2-cp36-cp36m-win_amd64.whl
+  - dist/TrezorCrypto-0.0.2-cp36-cp36m-win32.whl
+  - dist/TrezorCrypto-0.0.2-cp36-cp36m-linux_x86_64.whl
+  - dist/TrezorCrypto-0.0.2-cp36-cp36m-macosx_10_9_x86_64.whl
   on:
     repo: zebra-lucky/trezor-crypto
     tags: true
