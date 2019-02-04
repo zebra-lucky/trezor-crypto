@@ -57,7 +57,7 @@ ext_modules = [
 
 setup(
     name='TrezorCrypto',
-    version='0.0.1',
+    version='0.0.2',
     description='Cython wrapper around trezor-crypto library',
     license='MIT',
     url='https://github.com/trezor/trezor-crypto',

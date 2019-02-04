@@ -580,6 +580,7 @@ def bip39_from_data(data: bytes) -> str:
         raise ValueError('Invalid data length (only 16, 20, 24,'
                          ' 28 and 32 bytes are allowed)')
     cdef const char *mnemo = cbip39.mnemonic_from_data(<uint8_t *>data, data_len)
+    return PyUnicode_InternFromString(mnemo)
 
 
 def bip39_check(mnemonic: str) -> bool:
