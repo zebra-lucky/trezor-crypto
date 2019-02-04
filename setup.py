@@ -55,10 +55,17 @@ ext_modules = [
     ),
 ]
 
+
+description='Cython wrapper around trezor-crypto library'
+
+long_description=('Cython bindings for '
+                  'https://github.com/trezor/trezor-crypto. '
+                  'Use for reference / educational purposes only.')
+
+
 setup(
     name='TrezorCrypto',
     version='0.0.2',
-    description='Cython wrapper around trezor-crypto library',
     license='MIT',
     url='https://github.com/trezor/trezor-crypto',
     ext_modules=cythonize(ext_modules),
@@ -69,4 +76,6 @@ setup(
         'Operating System :: MacOS :: MacOS X',
         'Programming Language :: Python :: 3 :: Only',
     ],
+    description=description,
+    long_description=long_description,
 )

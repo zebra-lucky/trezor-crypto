@@ -4,9 +4,11 @@ include LICENSE
 include README.md
 
 include *.c *.h
-recursive-include aes *.c
-recursive-include chacha20poly1305 *.c
-recursive-include ed25519-donna *.c
-recursive-include monero *.c
+include nist256p1.table
+include secp256k1.table
+recursive-include aes *.c *.h
+recursive-include chacha20poly1305 *.c *.h
+recursive-include ed25519-donna *.c *.h
+recursive-include monero *.c *.h
 
 recursive-include extmod *.pxi *.pxd *.pyx
