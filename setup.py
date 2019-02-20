@@ -65,9 +65,10 @@ long_description=('Cython bindings for '
 
 setup(
     name='TrezorCrypto',
-    version='0.0.4',
+    version='0.0.5',
     license='MIT',
     url='https://github.com/zebra-lucky/trezor-crypto',
+    install_requires=['Cython>=0.29.1'],
     ext_modules=cythonize(ext_modules),
     classifiers=[
         'License :: OSI Approved :: MIT License',
