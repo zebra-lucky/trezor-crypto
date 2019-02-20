@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 
 from setuptools import setup, Extension
-from Cython.Build import cythonize
+
+try:
+    from Cython.Build import cythonize
+except ImportError:
+     def cythonize(*args, **kwargs):
+         from Cython.Build import cythonize
+         return cythonize(*args, **kwargs)
 
 
 TREZOR_CRYPTO_SOURCES = [
@@ -65,10 +71,10 @@ long_description=('Cython bindings for '
 
 setup(
     name='TrezorCrypto',
-    version='0.0.5',
+    version='0.0.6',
     license='MIT',
     url='https://github.com/zebra-lucky/trezor-crypto',
-    install_requires=['Cython>=0.29.1'],
+    setup_requires=['Cython>=0.29.1'],
     ext_modules=cythonize(ext_modules),
     classifiers=[
         'License :: OSI Approved :: MIT License',
